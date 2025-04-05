@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Airport Lounge Finder</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .chat-container {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            height: 500px;
+            display: flex;
+            flex-direction: column;
+        }
+        .chat-header {
+            background-color: #003580;
+            color: white;
+            padding: 15px;
+            border-radius: 10px 10px 0 0;
+            text-align: center;
+            font-weight: bold;
+        }
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        .message {
+            margin-bottom: 15px;
+            padding: 10px 15px;
+            border-radius: 18px;
+            max-width: 70%;
+        }
+        .bot-message {
+            background-color: #e9f0f7;
+            align-self: flex-start;
+            border-bottom-left-radius: 5px;
+        }
+        .user-message {
+            background-color: #003580;
+            color: white;
+            align-self: flex-end;
+            margin-left: auto;
+            border-bottom-right-radius: 5px;
+        }
+        .chat-input {
+            display: flex;
+            padding: 15px;
+            border-top: 1px solid #eee;
+        }
+        #user-input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            outline: none;
+        }
+        #send-button {
+            background-color: #003580;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            padding: 10px 20px;
+            margin-left: 10px;
+            cursor: pointer;
+        }
+        .lounge-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            background-color: #f9f9f9;
+        }
+        .lounge-name {
+            font-weight: bold;
+            color: #003580;
+            margin-bottom: 5px;
+        }
+        .lounge-detail {
+            margin: 5px 0;
+            font-size: 14px;
+        }
+        .detail-label {
+            font-weight: bold;
+            color: #555;
+        }
+        .rating {
+            color: #ffa500;
+            font-weight: bold;
+        }
+        .quick-reply {
+            display: inline-block;
+            background-color: #e9f0f7;
+            padding: 5px 10px;
+            margin: 5px;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .quick-reply:hover {
+            background-color: #d0e0f0;
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            AI Airport Lounge Finder ✈️
+        </div>
+        <div class="chat-messages" id="chat-messages">
+            <div class="message bot-message">
+                Hello! I can help you find airport lounges worldwide. Where are you flying from?
+                <br><br>Try asking:<br>
+                <div class="quick-reply" onclick="sendQuickReply('Find lounges at JFK')">Find lounges at JFK</div>
+                <div class="quick-reply" onclick="sendQuickReply('Priority Pass lounges in Dubai')">Priority Pass lounges in Dubai</div>
+                <div class="quick-reply" onclick="sendQuickReply('Lounges with showers in LAX')">Lounges with showers in LAX</div>
+            </div>
+        </div>
+        <div class="chat-input">
+            <input type="text" id="user-input" placeholder="Type your message..." onkeypress="handleKeyPress(event)">
+            <button id="send-button" onclick="sendMessage()">Send</button>
+        </div>
+    </div>
+
+    <script>
+        function sendMessage() {
+            const input = document.getElementById('user-input');
+            const message = input.value.trim();
+            
+            if (message) {
+                addMessage(message, 'user');
+                input.value = '';
+                processQuery(message);
+            }
+        }
+        
+        function sendQuickReply(message) {
+            addMessage(message, 'user');
+            processQuery(message);
+        }
+        
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+        
+        function addMessage(text, sender) {
+            const messagesDiv = document.getElementById('chat-messages');
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('message');
+            messageDiv.classList.add(sender + '-message');
+            
+            if (typeof text === 'string') {
+                messageDiv.innerHTML = text;
+            } else {
+                // Handle structured data (like lounge cards)
+                messageDiv.appendChild(text);
+            }
+            
+            messagesDiv.appendChild(messageDiv);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+        
+        function createLoungeCard(lounge) {
+            const card = document.createElement('div');
+            card.className = 'lounge-card';
+            
+            const name = document.createElement('div');
+            name.className = 'lounge-name';
+            name.textContent = lounge.name;
+            card.appendChild(name);
+            
+            const terminal = document.createElement('div');
+            terminal.className = 'lounge-detail';
+            terminal.innerHTML = `<span class="detail-label">Terminal:</span> ${lounge.terminal}`;
+            card.appendChild(terminal);
+            
+            const location = document.createElement('div');
+            location.className = 'lounge-detail';
+            location.innerHTML = `<span class="detail-label">Location:</span> ${lounge.location}`;
+            card.appendChild(location);
+            
+            const access = document.createElement('div');
+            access.className = 'lounge-detail';
+            access.innerHTML = `<span class="detail-label">Access:</span> ${lounge.access}`;
+            card.appendChild(access);
+            
+            const amenities = document.createElement('div');
+            amenities.className = 'lounge-detail';
+            amenities.innerHTML = `<span class="detail-label">Amenities:</span> ${lounge.amenities}`;
+            card.appendChild(amenities);
+            
+            const hours = document.createElement('div');
+            hours.className = 'lounge-detail';
+            hours.innerHTML = `<span class="detail-label">Hours:</span> ${lounge.hours}`;
+            card.appendChild(hours);
+            
+            const rating = document.createElement('div');
+            rating.className = 'lounge-detail';
+            rating.innerHTML = `<span class="detail-label">Rating:</span> <span class="rating">${'★'.repeat(Math.floor(lounge.rating))}${'☆'.repeat(5-Math.floor(lounge.rating))} (${lounge.rating})</span>`;
+            card.appendChild(rating);
+            
+            const detailsBtn = document.createElement('div');
+            detailsBtn.className = 'quick-reply';
+            detailsBtn.textContent = 'More details';
+            detailsBtn.onclick = function() {
+                getLoungeDetails(lounge.name, lounge.airport);
+            };
+            card.appendChild(detailsBtn);
+            
+            return card;
+        }
+        
+        function processQuery(query) {
+            fetch('/api/find_lounges', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ query: query })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.options && data.options.length > 0) {
+                    addMessage(data.response, 'bot');
+                    
+                    data.options.forEach(lounge => {
+                        const card = createLoungeCard(lounge);
+                        addMessage(card, 'bot');
+                    });
+                    
+                    // Add quick replies
+                    const quickReplies = document.createElement('div');
+                    quickReplies.style.marginTop = '10px';
+                    
+                    const reply1 = document.createElement('span');
+                    reply1.className = 'quick-reply';
+                    reply1.textContent = `Show more at ${data.airport}`;
+                    reply1.onclick = function() {
+                        sendQuickReply(`Show all lounges at ${data.airport.split(' ')[0]}`);
+                    };
+                    quickReplies.appendChild(reply1);
+                    
+                    const reply2 = document.createElement('span');
+                    reply2.className = 'quick-reply';
+                    reply2.textContent = 'Find lounges with showers';
+                    reply2.onclick = function() {
+                        sendQuickReply(`Find lounges with showers at ${data.airport.split(' ')[0]}`);
+                    };
+                    quickReplies.appendChild(reply2);
+                    
+                    addMessage(quickReplies, 'bot');
+                } else {
+                    addMessage(data.response, 'bot');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                addMessage("Sorry, I encountered an error processing your request.", 'bot');
+            });
+        }
+        
+        function getLoungeDetails(loungeName, airportCode) {
+            fetch('/api/lounge_details', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ 
+                    lounge_name: loungeName,
+                    airport_code: airportCode
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                addMessage(data.response, 'bot');
+                
+                if (data.details) {
+                    const detailsDiv = document.createElement('div');
+                    detailsDiv.style.marginTop = '10px';
+                    
+                    if (data.details.description) {
+                        const desc = document.createElement('div');
+                        desc.textContent = data.details.description;
+                        desc.style.marginBottom = '10px';
+                        detailsDiv.appendChild(desc);
+                    }
+                    
+                    if (data.details.contact) {
+                        const contact = document.createElement('div');
+                        contact.innerHTML = `<span class="detail-label">Contact:</span> ${data.details.contact}`;
+                        contact.style.marginBottom = '5px';
+                        detailsDiv.appendChild(contact);
+                    }
+                    
+                    if (data.details.map_url) {
+                        const mapLink = document.createElement('a');
+                        mapLink.href = data.details.map_url;
+                        mapLink.target = '_blank';
+                        mapLink.textContent = 'View on airport map';
+                        mapLink.style.display = 'block';
+                        mapLink.style.marginBottom = '10px';
+                        mapLink.style.color = '#003580';
+                        detailsDiv.appendChild(mapLink);
+                    }
+                    
+                    if (data.details.reviews && data.details.reviews.length > 0) {
+                        const reviewsTitle = document.createElement('div');
+                        reviewsTitle.textContent = 'Recent Reviews:';
+                        reviewsTitle.style.fontWeight = 'bold';
+                        reviewsTitle.style.margin = '10px 0 5px 0';
+                        detailsDiv.appendChild(reviewsTitle);
+                        
+                        const reviewsList = document.createElement('ul');
+                        reviewsList.style.marginTop = '0';
+                        data.details.reviews.forEach(review => {
+                            const item = document.createElement('li');
+                            item.textContent = review;
+                            item.style.marginBottom = '5px';
+                            reviewsList.appendChild(item);
+                        });
+                        detailsDiv.appendChild(reviewsList);
+                    }
+                    
+                    addMessage(detailsDiv, 'bot');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                addMessage("Sorry, I couldn't retrieve lounge details.", 'bot');
+            });
+        }
+    </script>
+</body>
+</html>

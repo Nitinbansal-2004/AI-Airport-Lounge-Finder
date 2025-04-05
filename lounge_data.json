@@ -1,0 +1,32 @@
+[
+    {
+        "name": "Delta Sky Club",
+        "airport_code": "JFK",
+        "terminal": "4",
+        "location": "Near Gate B32",
+        "access_methods": ["Delta Business Class", "Delta Elite Status", "Priority Pass", "Paid Entry"],
+        "amenities": ["Showers", "Hot Food", "Premium Bar", "Free WiFi", "Work Stations"],
+        "hours": "05:00-23:00",
+        "rating": 4.5,
+        "description": "Spacious lounge with runway views and premium amenities.",
+        "images": ["delta_jfk1.jpg", "delta_jfk2.jpg"],
+        "reviews": ["Great lounge with excellent food options.", "Often crowded during peak hours."],
+        "contact": "+1 800-221-1212",
+        "map_url": "https://maps.jfk.com/delta-lounge"
+    },
+    {
+        "name": "American Express Centurion Lounge",
+        "airport_code": "LAS",
+        "terminal": "1",
+        "location": "Near D Gates",
+        "access_methods": ["American Express Platinum", "Centurion Card", "Paid Entry ($50)"],
+        "amenities": ["Showers", "Gourmet Food", "Craft Cocktails", "Free WiFi", "Spa Services"],
+        "hours": "07:00-21:00",
+        "rating": 4.8,
+        "description": "Luxury lounge with premium dining and spa services.",
+        "images": ["amex_las1.jpg", "amex_las2.jpg"],
+        "reviews": ["Best lounge in Vegas!", "Spa treatments are amazing."],
+        "contact": "+1 800-528-4800",
+        "map_url": "https://maps.las.com/amex-lounge"
+    }
+]
